@@ -3,7 +3,7 @@ import {login} from '../services/login'
 import Taro from "@tarojs/taro";
 
 export const accountLogin = (params) => {
-  // 调接口获得user数据
+  // 调接口获得user数据,需要异步调用
   login({
     url: '/api/login',
     params,
