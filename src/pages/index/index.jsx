@@ -3,17 +3,14 @@ import {View, Text} from '@tarojs/components'
 import {AtButton, AtInput, AtForm, AtMessage} from 'taro-ui'
 import {connect} from '@tarojs/redux'
 import './index.scss'
-import {login} from '../../services/login'
-import {add, del} from '../../actions/index'
-import {accountLogin} from '../../actions/user'
+import {login, saveCurrentUser} from '../../actions/user'
 
 class Index extends Component {
   constructor(props) {
     super(...arguments)
     this.state = {
-      loginName: '',
-      password: '',
-      newTodo: ''
+      loginName: 'admin',
+      password: 'test',
     }
   }
 
@@ -52,19 +49,11 @@ class Index extends Component {
 
   onSubmit = (event) => {
     const {loginName, password} = this.state
-    this.props.accountLogin({username: loginName, password})
-    /*login({
-      url: '/api/login',
-      params: {username: loginName, password},
-      callback: (res) => {
-        console.log(res)
-        Taro.atMessage({
-          'message': `登陆${res.statusCode === 200 ? '成功' : '失败'}`,
-          'type': `${res.statusCode === 200 ? 'success' : 'warning'}`,
-        })
-        Taro.navigateTo({url: '/pages/index/todo'})
-      }
-    })*/
+    const {login, saveCurrentUser} = this.props
+    login({username: loginName, password}, (response) => {
+      Taro.navigateTo({url: '/pages/study/list'})
+      saveCurrentUser(response)
+    })
   }
   onReset = () => {
   }
@@ -105,17 +94,13 @@ class Index extends Component {
   }
 }
 
-export default connect(({todos, user}) => ({
-  todos: todos.todos,
+export default connect(({user}) => ({
   user
 }), (dispatch) => ({
-  add(data) {
-    dispatch(add(data))
+  login(params, callback) {
+    dispatch(login(params, callback))
   },
-  del(id) {
-    dispatch(del(id))
+  saveCurrentUser(params) {
+    dispatch(saveCurrentUser(params))
   },
-  accountLogin(params) {
-    dispatch(accountLogin(params))
-  }
 }))(Index)

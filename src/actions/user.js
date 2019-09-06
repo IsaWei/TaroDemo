@@ -1,29 +1,28 @@
-import {LOGIN} from '../constants/user'
-import {login} from '../services/login'
+import {CURRENT_USER, LOGIN} from '../constants/user'
+import {accountLogin} from '../services/login'
 import Taro from "@tarojs/taro";
 
-export const accountLogin = (params) => {
-  // 调接口获得user数据,需要异步调用
-  login({
+export const login = (params, callback) => {
+  // 调接口获得user数据
+  accountLogin({
     url: '/api/login',
     params,
-    callback: (res) => {
-      console.log(res)
-      Taro.atMessage({
-        'message': `登陆${res.statusCode === 200 ? '成功' : '失败'}`,
-        'type': `${res.statusCode === 200 ? 'success' : 'warning'}`,
-      })
-      Taro.navigateTo({url: '/pages/index/todo'})
-      debugger
-      return {
-        user: res.data,
-        type: LOGIN
-      }
-    }
+  }).then(res => {
+    debugger
+    Taro.atMessage({
+      'message': `登陆${res.statusCode === 200 ? '成功' : '失败'}`,
+      'type': `${res.statusCode === 200 ? 'success' : 'warning'}`,
+    })
+    localStorage.setItem('TARO_USER', JSON.stringify(res.data.data))
+    if (callback) callback(res.data.data)
   })
+}
+
+export const saveCurrentUser = (currentUser) => {
+  console.log('--currentUser in action--', currentUser)
   return {
-    user: {},
-    type: LOGIN
+    currentUser,
+    type: CURRENT_USER
   }
 }
 
